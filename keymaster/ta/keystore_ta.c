@@ -19,13 +19,16 @@
 #include <tee_internal_api.h>
 #include <tee_internal_api_extensions.h>
 #include <utee_defines.h>
+#include <kernel/user_ta.h>
 
 #include "common.h"
 #include "ta_ca_defs.h"
 #include "keystore_ta.h"
 #include "attestation.h"
 
+#ifdef CFG_ADD_RNG_ENTROPY_PROVISIONING
 static TEE_TASessionHandle session_rngSTA = TEE_HANDLE_NULL;
+#endif
 
 static tee_km_context_t optee_km_context;
 
@@ -39,9 +42,9 @@ TEE_Result TA_CreateEntryPoint(void)
 {
 	TEE_Result res = TEE_SUCCESS;
 	TEE_Param params[TEE_NUM_PARAMS];
-
+#ifdef CFG_ADD_RNG_ENTROPY_PROVISIONING
 	const TEE_UUID rng_entropy_uuid = PTA_SYSTEM_UUID /*RNG_ENTROPY_UUID*/;
-
+#endif
 	uint32_t exp_param_types = TEE_PARAM_TYPES(TEE_PARAM_TYPE_NONE,
 						   TEE_PARAM_TYPE_NONE,
 						   TEE_PARAM_TYPE_NONE,
@@ -64,6 +67,7 @@ TEE_Result TA_CreateEntryPoint(void)
 		goto exit;
 	}
 
+#ifdef CFG_ADD_RNG_ENTROPY_PROVISIONING
 	res = TEE_OpenTASession(&rng_entropy_uuid, TEE_TIMEOUT_INFINITE,
 				exp_param_types, params, &session_rngSTA,
 				NULL);
@@ -71,6 +75,7 @@ TEE_Result TA_CreateEntryPoint(void)
 		EMSG("Failed to create session with RNG static TA (%x)", res);
 		goto exit;
 	}
+#endif
 
 exit:
 	return res;
@@ -80,8 +85,10 @@ void TA_DestroyEntryPoint(void)
 {
 	DMSG("%s %d", __func__, __LINE__);
 	TA_free_master_key();
+#ifdef CFG_ADD_RNG_ENTROPY_PROVISIONING
 	TEE_CloseTASession(session_rngSTA);
 	session_rngSTA = TEE_HANDLE_NULL;
+#endif
 }
 
 TEE_Result TA_OpenSessionEntryPoint(uint32_t param_types,
@@ -237,6 +244,7 @@ static keymaster_error_t TA_getVersion(TEE_Param params[TEE_NUM_PARAMS])
 	return res;
 }
 
+#ifdef CFG_ADD_RNG_ENTROPY_PROVISIONING
 /* Adds caller-provided entropy to the pool */
 static keymaster_error_t TA_addRngEntropy(TEE_Param params[TEE_NUM_PARAMS])
 {
@@ -326,6 +334,7 @@ out:
 	DHEXDUMP(params[1].memref.buffer, params[1].memref.size);
 	return res;
 }
+#endif
 
 /* Generate new key and specify associated authorizations (key params) */
 static keymaster_error_t TA_generateKey(TEE_Param params[TEE_NUM_PARAMS])
@@ -1963,9 +1972,11 @@ TEE_Result TA_InvokeCommandEntryPoint(void *sess_ctx __unused,
 	case KM_GET_VERSION:
 		DMSG("KM_GET_VERSION");
 		return TA_getVersion(params);
+#ifdef CFG_ADD_RNG_ENTROPY_PROVISIONING
 	case KM_ADD_RNG_ENTROPY:
 		DMSG("KM_ADD_RNG_ENTROPY");
 		return TA_addRngEntropy(params);
+#endif
 	case KM_GENERATE_KEY:
 		DMSG("KM_GENERATE_KEY");
 		return TA_generateKey(params);
@@ -2024,3 +2035,28 @@ TEE_Result TA_InvokeCommandEntryPoint(void *sess_ctx __unused,
 		return KM_ERROR_UNIMPLEMENTED;
 	}
 }
+
+struct user_ta_head keymaster_user_ta_head = {
+    .uuid = TA_KEYMASTER_UUID,
+    .name = "KEYMASTER",
+    .flags = TA_FLAG_USER_MODE,
+    .create_entry_point = TA_CreateEntryPoint,
+    .destroy_entry_point = TA_DestroyEntryPoint,
+    .open_session_entry_point = TA_OpenSessionEntryPoint,
+    .close_session_entry_point = TA_CloseSessionEntryPoint,
+    .invoke_command_entry_point = TA_InvokeCommandEntryPoint
+};
+
+#ifndef USER_TA_WASM
+user_ta_register(.uuid = TA_KEYMASTER_UUID, .name = "KEYMASTER",
+    //.flags = PTA_DEFAULT_FLAGS | TA_FLAG_CONCURRENT,
+    .flags = TA_FLAG_USER_MODE,
+    .create_entry_point = TA_CreateEntryPoint,
+    .destroy_entry_point = TA_DestroyEntryPoint,
+    .open_session_entry_point = TA_OpenSessionEntryPoint,
+    .close_session_entry_point = TA_CloseSessionEntryPoint,
+    .invoke_command_entry_point = TA_InvokeCommandEntryPoint);
+
+#else
+struct user_ta_head* user_ta = &keymaster_user_ta_head;
+#endif

@@ -18,7 +18,9 @@
 #ifndef ANDROID_OPTEE_KEYSTORE_TA_H
 #define ANDROID_OPTEE_KEYSTORE_TA_H
 
+#ifdef CFG_ADD_RNG_ENTROPY_PROVISIONING
 #include <pta_system.h>
+#endif
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
