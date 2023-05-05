@@ -3,7 +3,7 @@
 
 #include <attestation.h>
 #include <generator.h>
-
+#ifdef CFG_MBEDTLS_PROVISIONING
 #include <mbedtls/aes.h>
 #include <mbedtls/base64.h>
 #include <mbedtls/bignum.h>
@@ -20,7 +20,7 @@
 #include <mbedtls/x509.h>
 #include <mbedtls/pk.h>
 #include <mbedtls/asn1write.h>
-
+#endif
 
 #define CERT_ROOT_ORG "Android"
 #define CERT_ROOT_ORG_UNIT_RSA "Attestation RSA root CA"
@@ -35,9 +35,9 @@
 #define TIME_STRLEN 15
 
 #define MBEDTLS_OID_ATTESTATION "\x2B\x06\x01\x04\x01\xD6\x79\x02\x01\x11"
-
+#ifdef CFG_MBEDTLS_PROVISIONING
 #include <printk.h>
-
+#endif
 /*
  * RSA public keys:
  *  SubjectPublicKeyInfo  ::=  SEQUENCE  {          1 + 3
@@ -90,6 +90,7 @@ enum BootState {
 	Failed
 };
 
+#ifdef CFG_MBEDTLS_PROVISIONING
 /* Stubs for hash values used in RottOfTrust */
 //TODO: calculate real values
 static uint8_t key_stub [32] = {
@@ -410,7 +411,7 @@ out:
 
 	return KM_ERROR_OK;
 }
-
+#endif
 keymaster_error_t mbedTLS_decode_pkcs8(keymaster_blob_t key_data,
 				       TEE_Attribute **attrs,
 				       uint32_t *attrs_count,
@@ -418,6 +419,8 @@ keymaster_error_t mbedTLS_decode_pkcs8(keymaster_blob_t key_data,
 				       uint32_t *key_size,
 				       uint64_t *rsa_public_exponent)
 {
+	return KM_ERROR_UNIMPLEMENTED;
+#ifdef CFG_MBEDTLS_PROVISIONING
 	mbedtls_pk_context pk;
 	keymaster_error_t ret = KM_ERROR_UNKNOWN_ERROR;
 	mbedtls_pk_type_t pk_type;
@@ -470,8 +473,9 @@ keymaster_error_t mbedTLS_decode_pkcs8(keymaster_blob_t key_data,
 out:
 	mbedtls_pk_free(&pk);
 	return ret;
+#endif
 }
-
+#ifdef CFG_MBEDTLS_PROVISIONING
 /* create mbedtls_pk_context based on ECC key attributes */
 static TEE_Result mbedTLS_import_ecc_pk(mbedtls_pk_context *pk,
 					const TEE_ObjectHandle key_obj)
@@ -1021,10 +1025,12 @@ out:
 
 	return res;
 }
-
+#endif
 keymaster_error_t mbedTLS_encode_key(keymaster_blob_t *export_data,
                                      const uint32_t type,
                                      const TEE_ObjectHandle *obj_h) {
+	return KM_ERROR_UNIMPLEMENTED;
+#ifdef CFG_MBEDTLS_PROVISIONING
 	mbedtls_pk_context pk;
 	uint8_t buf[RSA_MAX_BYTES > EC_MAX_BYTES ? RSA_MAX_BYTES :
 						   EC_MAX_BYTES];
@@ -1063,11 +1069,14 @@ keymaster_error_t mbedTLS_encode_key(keymaster_blob_t *export_data,
 out:
 	mbedtls_pk_free(&pk);
 	return ret;
+#endif
 }
 
 TEE_Result mbedTLS_gen_root_cert_rsa(TEE_ObjectHandle rsa_root_key,
 				     keymaster_blob_t *rsa_root_cert)
 {
+	return TEE_ERROR_NOT_SUPPORTED;
+#ifdef CFG_MBEDTLS_PROVISIONING
 	TEE_Result res = TEE_SUCCESS;
 	mbedtls_pk_context issuer_key;
 
@@ -1100,12 +1109,15 @@ out:
 	mbedtls_pk_free(&issuer_key);
 
 	return res;
+#endif
 }
 
 
 TEE_Result mbedTLS_gen_root_cert_ecc(TEE_ObjectHandle ecc_root_key,
 				     keymaster_blob_t *ecc_root_cert)
 {
+	return TEE_ERROR_NOT_SUPPORTED;
+#ifdef CFG_MBEDTLS_PROVISIONING
 	TEE_Result res = TEE_SUCCESS;
 	mbedtls_pk_context issuer_key;
 
@@ -1138,8 +1150,9 @@ out:
 	mbedtls_pk_free(&issuer_key);
 
 	return res;
+#endif
 }
-
+#ifdef CFG_MBEDTLS_PROVISIONING
 static TEE_Result mbedTLS_attest_key_cert(mbedtls_pk_context *issuer_key,
 					  mbedtls_pk_context *subject_key,
 					  unsigned int key_usage,
@@ -1315,13 +1328,15 @@ out:
 
 	return res;
 }
-
+#endif
 TEE_Result mbedTLS_gen_attest_key_cert(TEE_ObjectHandle root_key,
 				       TEE_ObjectHandle attest_key,
 				       keymaster_algorithm_t alg,
 				       unsigned int key_usage,
 				       keymaster_cert_chain_t *cert_chain,
 				       keymaster_blob_t *attest_ext) {
+	return TEE_ERROR_NOT_IMPLEMENTED;
+#ifdef CFG_MBEDTLS_PROVISIONING
 	int ret;
 	TEE_Result res = TEE_SUCCESS;
 	keymaster_blob_t *attest_cert = &cert_chain->entries[KEY_ATT_CERT_INDEX];
@@ -1389,10 +1404,12 @@ out:
 	TEE_Free( cert );
 
 	return res;
-
+#endif
 }
 
 keymaster_error_t mbedTLS_encode_ec_sign(uint8_t *out, uint32_t *out_l) {
+	return KM_ERROR_UNIMPLEMENTED;
+#ifdef CFG_MBEDTLS_PROVISIONING
 	keymaster_error_t ret = KM_ERROR_UNKNOWN_ERROR;
 	uint32_t r_size = *out_l / 2;
 	uint32_t s_size = *out_l / 2;
@@ -1449,10 +1466,13 @@ err:
 	mbedtls_mpi_free(&s);
 
 	return ret;
+#endif
 }
 
 keymaster_error_t mbedTLS_decode_ec_sign(keymaster_blob_t *sig,
 					 uint32_t key_size) {
+	return KM_ERROR_UNIMPLEMENTED;
+#ifdef CFG_MBEDTLS_PROVISIONING
 	keymaster_error_t ret = KM_ERROR_VERIFICATION_FAILED;
 	unsigned char *p = (unsigned char *)sig->data;
 	const unsigned char *end = sig->data + sig->data_length;
@@ -1523,8 +1543,10 @@ err:
 	mbedtls_mpi_free(&s);
 
 	return ret;
+#endif
 }
 
+#ifdef CFG_MBEDTLS_PROVISIONING
 /**
  * \brief           Writes RootOfTrust to a buffer
  *
@@ -1629,7 +1651,7 @@ static int asn1_write_set_of_int(uint32_t *arr, unsigned long size,
 
 	return 0;
 }
-
+#endif
 typedef struct asn1_buf
 {
     int context_specific;
@@ -1645,6 +1667,7 @@ typedef struct asn1_sequence
 	struct asn1_sequence *next;    /**< The next entry in the sequence. */
 } asn1_sequence;
 
+#ifdef CFG_MBEDTLS_PROVISIONING
 typedef struct param_enforcement {
 	keymaster_key_param_set_t *pars;
 	bool hw_enforced;
@@ -2272,6 +2295,7 @@ static keymaster_error_t mbedTLS_gen_att_extension(keymaster_key_characteristics
 
 	return KM_ERROR_OK;
 }
+#endif
 
 TEE_Result TA_gen_attest_cert(TEE_ObjectHandle attestedKey,
                               keymaster_key_param_set_t *attest_params,
@@ -2281,6 +2305,8 @@ TEE_Result TA_gen_attest_cert(TEE_ObjectHandle attestedKey,
                               keymaster_algorithm_t alg,
                               keymaster_cert_chain_t *cert_chain)
 {
+	return TEE_ERROR_NOT_IMPLEMENTED;
+#ifdef CFG_MBEDTLS_PROVISIONING
 	TEE_Result res = TEE_SUCCESS;
 	TEE_ObjectHandle rootAttKey = TEE_HANDLE_NULL;
 	keymaster_blob_t attest_ext = EMPTY_BLOB;
@@ -2340,4 +2366,5 @@ error_1:
 	TEE_Free(attest_ext.data);
 
 	return res;
+#endif
 }
