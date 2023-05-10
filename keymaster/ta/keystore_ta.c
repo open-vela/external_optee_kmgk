@@ -163,7 +163,7 @@ static keymaster_error_t TA_configure(TEE_Param params[TEE_NUM_PARAMS])
 	in_size = (size_t)params[0].memref.size;
 	in_end = in + in_size;
 	out = (uint8_t *)params[1].memref.buffer;
-	out_size = (size_t)params[1].memref.size; /* limited to 8192 */
+	out_size = (size_t)params[1].memref.size; /* limited to KM_RECV_BUF_SIZE */
 	out_end = out + out_size;
 
 	DMSG("%s %d", __func__, __LINE__);
@@ -224,7 +224,7 @@ static keymaster_error_t TA_getVersion(TEE_Param params[TEE_NUM_PARAMS])
 	DMSG("%s %d", __func__, __LINE__);
 
 	out = (uint8_t *)params[1].memref.buffer;
-	out_size = (size_t)params[1].memref.size; /* limited to 8192 */
+	out_size = (size_t)params[1].memref.size; /* limited to KM_RECV_BUF_SIZE */
 	out_end = out + out_size;
 	if (!out) {
 		EMSG("Unexpected null pointer");
@@ -268,7 +268,7 @@ static keymaster_error_t TA_addRngEntropy(TEE_Param params[TEE_NUM_PARAMS])
 	in_size = (size_t)params[0].memref.size;
 	in_end = in + in_size;
 	out = (uint8_t *)params[1].memref.buffer;
-	out_size = (size_t)params[1].memref.size; /* limited to 8192 */
+	out_size = (size_t)params[1].memref.size; /* limited to KM_RECV_BUF_SIZE */
 	out_end = out + out_size;
 
 	DMSG("%s %d", __func__, __LINE__);
@@ -362,7 +362,7 @@ static keymaster_error_t TA_generateKey(TEE_Param params[TEE_NUM_PARAMS])
 	in = (uint8_t *)params[0].memref.buffer;
 	in_end = in + params[0].memref.size;
 	out = (uint8_t *)params[1].memref.buffer;
-	out_size = (size_t)params[1].memref.size; /* limited to 8192 */
+	out_size = (size_t)params[1].memref.size; /* limited to KM_RECV_BUF_SIZE */
 	out_end = out + out_size;
 
 	DMSG("%s %d", __func__, __LINE__);
@@ -523,7 +523,7 @@ static keymaster_error_t TA_getKeyCharacteristics(
 	in = (uint8_t *)params[0].memref.buffer;
 	in_end = in + params[0].memref.size;
 	out = (uint8_t *)params[1].memref.buffer;
-	out_size = (size_t)params[1].memref.size; /* limited to 8192 */
+	out_size = (size_t)params[1].memref.size; /* limited to KM_RECV_BUF_SIZE */
 	out_end = out + out_size;
 
 	if (!in || !out) {
@@ -638,7 +638,7 @@ static keymaster_error_t TA_importKey(TEE_Param params[TEE_NUM_PARAMS])
 	in = (uint8_t *)params[0].memref.buffer;
 	in_end = in + params[0].memref.size;
 	out = (uint8_t *)params[1].memref.buffer;
-	out_size = (size_t)params[1].memref.size; /* limited to 8192 */
+	out_size = (size_t)params[1].memref.size; /* limited to KM_RECV_BUF_SIZE */
 	out_end = out + out_size;
 
 	if (!in || !out) {
@@ -859,7 +859,7 @@ static keymaster_error_t TA_exportKey(TEE_Param params[TEE_NUM_PARAMS])
 	in = (uint8_t *)params[0].memref.buffer;
 	in_end = in + params[0].memref.size;
 	out = (uint8_t *)params[1].memref.buffer;
-	out_size = (size_t)params[1].memref.size; /* limited to 8192 */
+	out_size = (size_t)params[1].memref.size; /* limited to KM_RECV_BUF_SIZE */
 	out_end = out + out_size;
 
 	if (!in || !out) {
@@ -994,7 +994,7 @@ static keymaster_error_t TA_attestKey(TEE_Param params[TEE_NUM_PARAMS])
 	in = (uint8_t *)params[0].memref.buffer;
 	in_end = in + params[0].memref.size;
 	out = (uint8_t *)params[1].memref.buffer;
-	out_size = params[1].memref.size; /* limited to 8192 */
+	out_size = params[1].memref.size; /* limited to KM_RECV_BUF_SIZE */
 	out_end = out + out_size;
 
 	if (!in || !out) {
@@ -1223,7 +1223,7 @@ static keymaster_error_t TA_upgradeKey(TEE_Param params[TEE_NUM_PARAMS])
 	in = (uint8_t *)params[0].memref.buffer;
 	in_end = in + params[0].memref.size;
 	out = (uint8_t *)params[1].memref.buffer;
-	out_size = (size_t)params[1].memref.size; /* limited to 8192 */
+	out_size = (size_t)params[1].memref.size; /* limited to KM_RECV_BUF_SIZE */
 	out_end = out + out_size;
 
 	if (!in || !out) {
@@ -1282,7 +1282,7 @@ static keymaster_error_t TA_deleteKey(TEE_Param params[TEE_NUM_PARAMS])
 	DMSG("%s %d", __func__, __LINE__);
 
 	out = (uint8_t *)params[1].memref.buffer;
-	out_size = (size_t)params[1].memref.size; /* limited to 8192 */
+	out_size = (size_t)params[1].memref.size; /* limited to KM_RECV_BUF_SIZE */
 	out_end = out + out_size;
 	if (!out) {
 		EMSG("Unexpected null pointer");
@@ -1314,7 +1314,7 @@ static keymaster_error_t TA_deleteAllKeys(TEE_Param params[TEE_NUM_PARAMS])
 	DMSG("%s %d", __func__, __LINE__);
 
 	out = (uint8_t *)params[1].memref.buffer;
-	out_size = (size_t)params[1].memref.size; /* limited to 8192 */
+	out_size = (size_t)params[1].memref.size; /* limited to KM_RECV_BUF_SIZE */
 	out_end = out + out_size;
 	if (!out) {
 		EMSG("Unexpected null pointer");
@@ -1347,7 +1347,7 @@ static keymaster_error_t TA_destroyAttestationIds(
 	DMSG("%s %d", __func__, __LINE__);
 
 	out = (uint8_t *)params[1].memref.buffer;
-	out_size = (size_t)params[1].memref.size; /* limited to 8192 */
+	out_size = (size_t)params[1].memref.size; /* limited to KM_RECV_BUF_SIZE */
 	out_end = out + out_size;
 	if (!out) {
 		EMSG("Unexpected null pointer");
@@ -1411,7 +1411,7 @@ static keymaster_error_t TA_begin(TEE_Param params[TEE_NUM_PARAMS])
 	in = (uint8_t *)params[0].memref.buffer;
 	in_end = in + params[0].memref.size;
 	out = (uint8_t *)params[1].memref.buffer;
-	out_size = (size_t)params[1].memref.size; /* limited to 8192 */
+	out_size = (size_t)params[1].memref.size; /* limited to KM_RECV_BUF_SIZE */
 	out_end = out + out_size;
 
 	if (!in || !out) {
@@ -1606,7 +1606,7 @@ static keymaster_error_t TA_update(TEE_Param params[TEE_NUM_PARAMS])
 	in = (uint8_t *)params[0].memref.buffer;
 	in_end = in + params[0].memref.size;
 	out = (uint8_t *)params[1].memref.buffer;
-	out_size = (size_t)params[1].memref.size; /* limited to 8192 */
+	out_size = (size_t)params[1].memref.size; /* limited to KM_RECV_BUF_SIZE */
 	out_end = out + out_size;
 
 	if (!in || !out) {
@@ -1763,7 +1763,7 @@ static keymaster_error_t TA_finish(TEE_Param params[TEE_NUM_PARAMS])
 	in = (uint8_t *)params[0].memref.buffer;
 	in_end = in + params[0].memref.size;
 	out = (uint8_t *)params[1].memref.buffer;
-	out_size = (size_t)params[1].memref.size; /* limited to 8192 */
+	out_size = (size_t)params[1].memref.size; /* limited to KM_RECV_BUF_SIZE */
 	out_end = out + out_size;
 
 	if (!in || !out) {
@@ -1922,7 +1922,7 @@ static keymaster_error_t TA_abort(TEE_Param params[TEE_NUM_PARAMS])
 	in = (uint8_t *)params[0].memref.buffer;
 	in_end = in + params[0].memref.size;
 	out = (uint8_t *)params[1].memref.buffer;
-	out_size = (size_t)params[1].memref.size; /* limited to 8192 */
+	out_size = (size_t)params[1].memref.size; /* limited to KM_RECV_BUF_SIZE */
 	out_end = out + out_size;
 
 	if (!in || !out) {

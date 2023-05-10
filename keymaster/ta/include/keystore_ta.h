@@ -40,7 +40,9 @@
 /*
  * KeyMaster message size
  */
+#ifndef KM_RECV_BUF_SIZE
 #define KM_RECV_BUF_SIZE 8192
+#endif
 
 /* Max size of attestation challenge */
 #define MAX_ATTESTATION_CHALLENGE 128
