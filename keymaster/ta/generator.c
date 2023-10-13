@@ -993,9 +993,9 @@ keymaster_error_t TA_create_operation(TEE_OperationHandle *operation,
 		return KM_ERROR_UNSUPPORTED_ALGORITHM;
 	}
 	TEE_GetObjectInfo1(obj_h, &info);
-	res = TEE_AllocateOperation(operation, algo, mode, info.maxKeySize);
+	res = TEE_AllocateOperation(operation, algo, mode, info.maxObjectSize);
 	if (res != TEE_SUCCESS) {
-		EMSG("Error TEE_AllocateOperation maxKeySize=%d", info.maxKeySize);
+		EMSG("Error TEE_AllocateOperation maxKeySize=%d", info.maxObjectSize);
 		goto out_co;
 	}
 	res = TEE_SetOperationKey(*operation, obj_h);
