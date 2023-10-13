@@ -170,7 +170,7 @@ TEE_Result TA_execute(uint8_t *data, const size_t size, const uint32_t mode)
 	}
 	TEE_GetObjectInfo1(secretKey, &info);
 
-	res = TEE_AllocateOperation(&op, TEE_ALG_AES_GCM, mode, info.maxKeySize);
+	res = TEE_AllocateOperation(&op, TEE_ALG_AES_GCM, mode, info.maxObjectSize);
 	if (res != TEE_SUCCESS) {
 		EMSG("Failed to allocate AES operation, res=%x", res);
 		goto exit;
