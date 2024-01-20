@@ -50,7 +50,7 @@ TEE_Result TA_InitializeAuthTokenKey(void)
 				TEE_DATA_FLAG_ACCESS_WRITE,
 				TEE_HANDLE_NULL, NULL, 0, &auth_token_key_obj);
 		if (res != TEE_SUCCESS) {
-			EMSG("Failed to create auth_token key secret, res=%x", res);
+			EMSG("Failed to create auth_token key secret, res=%" PRIx32, res);
 			goto out;
 		}
 
@@ -62,7 +62,7 @@ TEE_Result TA_InitializeAuthTokenKey(void)
 		TEE_MemFill(auth_token_key, 0, sizeof(auth_token_key));
 
 		if (res != TEE_SUCCESS) {
-			EMSG("Failed to write auth_token key secret, res=%x", res);
+			EMSG("Failed to write auth_token key secret, res=%" PRIx32, res);
 			goto close_obj;
 		}
 
@@ -71,7 +71,7 @@ TEE_Result TA_InitializeAuthTokenKey(void)
 		DMSG("auth_token key secret is already created");
 		break;
 	default:
-		EMSG("Failed to open auth_token key secret, res=%x", res);
+		EMSG("Failed to open auth_token key secret, res=%" PRIx32, res);
 		goto out;
 	}
 
@@ -95,7 +95,7 @@ static TEE_Result TA_GetClientIdentity(TEE_Identity *identity)
 			(char *)"gpd.client.identity", identity);
 
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to get property, res=%x", res);
+		EMSG("Failed to get property, res=%" PRIx32, res);
 		goto exit;
 	}
 
@@ -121,14 +121,14 @@ static TEE_Result TA_ReadAuthTokenKey(uint8_t *key, uint32_t key_size)
 			TEE_DATA_FLAG_ACCESS_READ | TEE_DATA_FLAG_SHARE_READ,
 			&auth_token_key_obj);
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to open auth_token key secret, res=%x", res);
+		EMSG("Failed to open auth_token key secret, res=%" PRIx32, res);
 		goto exit;
 	}
 
 	res = TEE_ReadObjectData(auth_token_key_obj, key,
 			key_size, &read_size);
 	if (res != TEE_SUCCESS || key_size != read_size) {
-		EMSG("Failed to read secret data, bytes = %u, res=%x", read_size, res);
+		EMSG("Failed to read secret data, bytes = %" PRIu32 ", res=%" PRIx32, read_size, res);
 		goto close_obj;
 	}
 
@@ -146,7 +146,7 @@ keymaster_error_t TA_GetAuthTokenKey(TEE_Param params[TEE_NUM_PARAMS])
 
 	res = TA_GetClientIdentity(&identity);
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to get identity property, res=%x", res);
+		EMSG("Failed to get identity property, res=%" PRIx32, res);
 		goto exit;
 	}
 
@@ -159,7 +159,7 @@ keymaster_error_t TA_GetAuthTokenKey(TEE_Param params[TEE_NUM_PARAMS])
 	DMSG("%pUl requests auth_token key", (void *)&identity.uuid);
 	res = TA_ReadAuthTokenKey(auth_token_key, sizeof(auth_token_key));
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to get auth_token key, res=%x", res);
+		EMSG("Failed to get auth_token key, res=%" PRIx32, res);
 		goto exit;
 	}
 
@@ -263,13 +263,13 @@ static TEE_Result TA_ComputeSignature(uint8_t *signature, size_t signature_lengt
 	res = TEE_AllocateOperation(&op, TEE_ALG_HMAC_SHA256, TEE_MODE_MAC,
 			HMAC_SHA256_KEY_SIZE_BIT);
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to allocate HMAC operation, res=%x", res);
+		EMSG("Failed to allocate HMAC operation, res=%" PRIx32, res);
 		goto exit;
 	}
 
 	res = TEE_SetOperationKey(op, key);
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to set secret key, res=%x", res);
+		EMSG("Failed to set secret key, res=%" PRIx32, res);
 		goto free_op;
 	}
 
@@ -277,7 +277,7 @@ static TEE_Result TA_ComputeSignature(uint8_t *signature, size_t signature_lengt
 
 	res = TEE_MACComputeFinal(op, (void *)message, length, buf, &buf_length);
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to compute HMAC, res=%x", res);
+		EMSG("Failed to compute HMAC, res=%" PRIx32, res);
 		goto free_op;
 	}
 
@@ -310,7 +310,7 @@ static TEE_Result TA_GetAuthKeyObj(TEE_ObjectHandle auth_token_key_obj)
 
 	res = TA_ReadAuthTokenKey(auth_token_key, sizeof(auth_token_key));
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to create auth_token key object, res=%x", res);
+		EMSG("Failed to create auth_token key object, res=%" PRIx32, res);
 		goto exit;
 	}
 
@@ -320,7 +320,7 @@ static TEE_Result TA_GetAuthKeyObj(TEE_ObjectHandle auth_token_key_obj)
 	res = TEE_PopulateTransientObject(auth_token_key_obj, attrs,
 			sizeof(attrs)/sizeof(attrs[0]));
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to set auth_token key attributes, res=%x", res);
+		EMSG("Failed to set auth_token key attributes, res=%" PRIx32, res);
 		goto exit;
 	}
 
@@ -349,20 +349,20 @@ static TEE_Result TA_ValidateTokenSignature(const hw_auth_token_t *token)
 	res = TEE_AllocateTransientObject(TEE_TYPE_HMAC_SHA256,
 			HMAC_SHA256_KEY_SIZE_BIT, &auth_token_key_obj);
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to allocate auth_token_key_obj, res=%x", res);
+		EMSG("Failed to allocate auth_token_key_obj, res=%" PRIx32, res);
 		goto exit;
 	}
 
 	res = TA_GetAuthKeyObj(auth_token_key_obj);
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to get auth_token key object, res=%x", res);
+		EMSG("Failed to get auth_token key object, res=%" PRIx32, res);
 		goto close_obj;
 	}
 
 	res = TA_ComputeSignature(computed_hmac, computed_hmac_length, auth_token_key_obj,
 			token_data, token_data_length);
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to compute auth_token signature, res=%x", res);
+		EMSG("Failed to compute auth_token signature, res=%" PRIx32, res);
 		goto close_obj;
 	}
 
