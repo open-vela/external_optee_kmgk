@@ -408,7 +408,7 @@ static TEE_Result TA_create_rsa_attest_key(void)
 	TEE_ObjectHandle transient_key = TEE_HANDLE_NULL;
 	uint32_t *attributes = NULL;
 	uint8_t *buffer = NULL;
-	uint32_t buffSize = RSA_KEY_BUFFER_SIZE;
+	size_t buffSize = RSA_KEY_BUFFER_SIZE;
 
 	res = TA_open_rsa_attest_key(&RSAobject);
 	if (res == TEE_ERROR_ITEM_NOT_FOUND) {
@@ -495,7 +495,7 @@ static TEE_Result TA_create_ec_attest_key(void)
 	TEE_ObjectHandle transient_key = TEE_HANDLE_NULL;
 	uint32_t *attributes = NULL;
 	uint8_t *buffer = NULL;
-	uint32_t buffSize = EC_KEY_BUFFER_SIZE;
+	size_t buffSize = EC_KEY_BUFFER_SIZE;
 	TEE_Attribute attrs[1];
 	uint32_t a = 0, b = 0;
 
@@ -887,7 +887,7 @@ TEE_Result TA_read_attest_cert(TEE_ObjectHandle attObj,
 {
 	TEE_Result res = TEE_SUCCESS;
 	TEE_ObjectInfo info = { 0 };
-	uint32_t actual_read = 0;
+	size_t actual_read = 0;
 	uint8_t* pBuf = NULL;
 	size_t nEntryCount = 1; // KEY_ATT_CERT_INDEX used for key attestation
 	uint32_t nCertLen = 0;
@@ -1005,7 +1005,7 @@ TEE_Result TA_generate_UniqueID(uint64_t T, uint8_t *appID, uint32_t appIDlen,
 	TEE_Result res = TEE_SUCCESS;
 	TEE_OperationHandle op = TEE_HANDLE_NULL;
 	TEE_ObjectHandle key = TEE_HANDLE_NULL;
-	uint32_t hmac_length = HMAC_SHA256_KEY_SIZE_BYTE;
+	size_t hmac_length = HMAC_SHA256_KEY_SIZE_BYTE;
 	uint8_t hmac_buf[HMAC_SHA256_KEY_SIZE_BYTE];
 
 	if (uniqueID == NULL) {
