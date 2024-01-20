@@ -107,7 +107,7 @@ TEE_Result TA_open_rsa_attest_key(TEE_ObjectHandle *rsaKey)
 	} else if (res == TEE_ERROR_ITEM_NOT_FOUND) {
 		DMSG("RSA persistent key does not exist");
 	} else {
-		EMSG("Failed to open a RSA persistent key, res=%x", res);
+		EMSG("Failed to open a RSA persistent key, res=%" PRIx32, res);
 	}
 	return res;
 }
@@ -124,7 +124,7 @@ TEE_Result TA_open_ec_attest_key(TEE_ObjectHandle *ecKey)
 	} else if (res == TEE_ERROR_ITEM_NOT_FOUND) {
 		DMSG("EC persistent key does not exist");
 	} else {
-		EMSG("Failed to open a EC persistent key, res=%x", res);
+		EMSG("Failed to open a EC persistent key, res=%" PRIx32, res);
 	}
 	return res;
 }
@@ -141,7 +141,7 @@ TEE_Result TA_open_root_rsa_attest_cert(TEE_ObjectHandle *attCert)
 	} else if (res == TEE_ERROR_ITEM_NOT_FOUND) {
 		DMSG("RSA persistent cert does not exist");
 	} else {
-		EMSG("Failed to open a root RSA persistent certificate, res=%x", res);
+		EMSG("Failed to open a root RSA persistent certificate, res=%" PRIx32, res);
 	}
 	return res;
 }
@@ -158,7 +158,7 @@ TEE_Result TA_open_root_ec_attest_cert(TEE_ObjectHandle *attCert)
 	} else if (res == TEE_ERROR_ITEM_NOT_FOUND) {
 		DMSG("EC persistent cert does not exist");
 	} else {
-		EMSG("Failed to open a root EC persistent certificate, res=%x", res);
+		EMSG("Failed to open a root EC persistent certificate, res=%" PRIx32, res);
 	}
 	return res;
 }
@@ -418,13 +418,13 @@ static TEE_Result TA_create_rsa_attest_key(void)
 		res = TEE_AllocateTransientObject(TEE_TYPE_RSA_KEYPAIR,
 				RSA_KEY_SIZE, &transient_key);
 		if (res != TEE_SUCCESS) {
-			EMSG("Failed to allocate RSA transient object, res=%x", res);
+			EMSG("Failed to allocate RSA transient object, res=%" PRIx32, res);
 			goto error_1;
 		}
 		//Generating an object (default exponent is 65537)
 		res = TEE_GenerateKey(transient_key, RSA_KEY_SIZE, NULL, 0);
 		if (res != TEE_SUCCESS) {
-			EMSG("Failed to generate RSA key, res=%x", res);
+			EMSG("Failed to generate RSA key, res=%" PRIx32, res);
 			goto error_2;
 		}
 		//Create object in storage
@@ -433,7 +433,7 @@ static TEE_Result TA_create_rsa_attest_key(void)
 				TEE_DATA_FLAG_ACCESS_WRITE,
 				TEE_HANDLE_NULL, NULL, 0U, &RSAobject);
 		if (res != TEE_SUCCESS) {
-			EMSG("Failed to create a RSA persistent key, res=%x", res);
+			EMSG("Failed to create a RSA persistent key, res=%" PRIx32, res);
 			goto error_2;
 		}
 		//List of RSA attributes
@@ -449,7 +449,7 @@ static TEE_Result TA_create_rsa_attest_key(void)
 			res = TEE_GetObjectBufferAttribute(transient_key, attributes[i],
 					buffer, &buffSize);
 			if (res != TEE_SUCCESS) {
-				EMSG("Failed to get RSA buffer attribute %x, res=%x",
+				EMSG("Failed to get RSA buffer attribute %" PRIx32 ", res=%" PRIx32,
 						attributes[i], res);
 				goto error_3;
 			}
@@ -457,7 +457,7 @@ static TEE_Result TA_create_rsa_attest_key(void)
 			//Store RSA key in format: size | buffer attribute
 			res = TA_write_obj_attr(RSAobject, buffer, buffSize);
 			if (res != TEE_SUCCESS) {
-				EMSG("Failed to write RSA attribute %x, res=%x",
+				EMSG("Failed to write RSA attribute %" PRIx32 ", res=%" PRIx32,
 						attributes[i], res);
 				goto error_3;
 			}
@@ -481,7 +481,7 @@ error_2:
 		TA_close_attest_obj(RSAobject);
 	} else {
 		//Something wrong...
-		EMSG("Failed to open RSA root attestation key, res=%x", res);
+		EMSG("Failed to open RSA root attestation key, res=%" PRIx32, res);
 	}
 
 error_1:
@@ -507,7 +507,7 @@ static TEE_Result TA_create_ec_attest_key(void)
 		res = TEE_AllocateTransientObject(TEE_TYPE_ECDSA_KEYPAIR,
 				EC_KEY_SIZE, &transient_key);
 		if (res != TEE_SUCCESS) {
-			EMSG("Failed to allocate EC transient object, res=%x", res);
+			EMSG("Failed to allocate EC transient object, res=%" PRIx32, res);
 			goto error_1;
 		}
 		//Generating an object (MUST provide TEE_ATTR_ECC_CURVE)
@@ -516,7 +516,7 @@ static TEE_Result TA_create_ec_attest_key(void)
 		res = TEE_GenerateKey(transient_key, EC_KEY_SIZE, attrs,
 				sizeof(attrs)/sizeof(TEE_Attribute));
 		if (res != TEE_SUCCESS) {
-			EMSG("Failed to generate EC key, res=%x", res);
+			EMSG("Failed to generate EC key, res=%" PRIx32, res);
 			goto error_2;
 		}
 		//Create object in storage
@@ -525,7 +525,7 @@ static TEE_Result TA_create_ec_attest_key(void)
 				TEE_DATA_FLAG_ACCESS_WRITE,
 				TEE_HANDLE_NULL, NULL, 0U, &ECobject);
 		if (res != TEE_SUCCESS) {
-			EMSG("Failed to create a EC persistent key, res=%x", res);
+			EMSG("Failed to create a EC persistent key, res=%" PRIx32, res);
 			goto error_2;
 		}
 		//List of EC attributes
@@ -543,7 +543,7 @@ static TEE_Result TA_create_ec_attest_key(void)
 						attributes[i], &a, &b);
 				if (res != TEE_SUCCESS)
 				{
-					EMSG("Failed to get EC value attribute %x, res=%x",
+					EMSG("Failed to get EC value attribute %" PRIx32 ", res=%" PRIx32,
 							attributes[i], res);
 					goto error_3;
 				}
@@ -552,7 +552,7 @@ static TEE_Result TA_create_ec_attest_key(void)
 						(void *)&a, sizeof(uint32_t));
 				if (res != TEE_SUCCESS)
 				{
-					EMSG("Failed to write EC value attribute %x, res=%x",
+					EMSG("Failed to write EC value attribute %" PRIx32 ", res=%" PRIx32,
 							attributes[i], res);
 					goto error_3;
 				}
@@ -562,7 +562,7 @@ static TEE_Result TA_create_ec_attest_key(void)
 				res = TEE_GetObjectBufferAttribute(transient_key,
 						attributes[i], buffer, &buffSize);
 				if (res != TEE_SUCCESS) {
-					EMSG("Failed to get EC buffer attribute %x, res=%x",
+					EMSG("Failed to get EC buffer attribute %" PRIx32 ", res=%" PRIx32,
 							attributes[i], res);
 					goto error_3;
 				}
@@ -571,7 +571,7 @@ static TEE_Result TA_create_ec_attest_key(void)
 				//Store EC key in format: size | buffer attribute
 				res = TA_write_obj_attr(ECobject, buffer, buffSize);
 				if (res != TEE_SUCCESS) {
-					EMSG("Failed to write EC attribute %x, res=%x",
+					EMSG("Failed to write EC attribute %" PRIx32 ", res=%" PRIx32,
 							attributes[i], res);
 					goto error_3;
 				}
@@ -596,7 +596,7 @@ error_2:
 		TA_close_attest_obj(ECobject);
 	} else {
 		//Something wrong...
-		EMSG("Failed to open EC root attestation key, res=%x", res);
+		EMSG("Failed to open EC root attestation key, res=%" PRIx32, res);
 	}
 
 error_1:
@@ -615,13 +615,13 @@ static TEE_Result TA_create_root_rsa_attest_cert(void)
 		//No such certificate, create it
 		DMSG("Root RSA attestation certificate creation...");
 		if (TA_open_rsa_attest_key(&obj_h) != TEE_SUCCESS) {
-			EMSG("Failed to open RSA key, res=%x", res);
+			EMSG("Failed to open RSA key, res=%" PRIx32, res);
 			goto error_1;
 		}
 		//Call ASN1 TA to generate root certificate
 		res = mbedTLS_gen_root_cert_rsa(obj_h, &root_cert);
 		if (res != TEE_SUCCESS) {
-			EMSG("Failed to generate RSA root certificate, res=%x", res);
+			EMSG("Failed to generate RSA root certificate, res=%" PRIx32, res);
 			goto error_2;
 		}
 
@@ -631,7 +631,7 @@ static TEE_Result TA_create_root_rsa_attest_cert(void)
 				TEE_DATA_FLAG_ACCESS_WRITE,
 				TEE_HANDLE_NULL, NULL, 0U, &CertObject);
 		if (res != TEE_SUCCESS) {
-			EMSG("Failed to create a persistent RSA certificate object, res=%x",
+			EMSG("Failed to create a persistent RSA certificate object, res=%" PRIx32,
 					res);
 			goto error_2;
 		}
@@ -641,7 +641,7 @@ static TEE_Result TA_create_root_rsa_attest_cert(void)
 				root_cert.data,
 				(uint32_t)root_cert.data_length);
 		if (res != TEE_SUCCESS) {
-			EMSG("Failed to write RSA certificate, res=%x", res);
+			EMSG("Failed to write RSA certificate, res=%" PRIx32, res);
 		}
 
 		(res == TEE_SUCCESS) ?
@@ -660,7 +660,7 @@ error_2:
 		TA_close_attest_obj(CertObject);
 	} else {
 		//Something wrong...
-		EMSG("Failed to open root RSA attestation certificate, res=%x", res);
+		EMSG("Failed to open root RSA attestation certificate, res=%" PRIx32, res);
 	}
 
 error_1:
@@ -679,13 +679,13 @@ static TEE_Result TA_create_root_ec_attest_cert(void)
 		//No such certificate, create it
 		DMSG("Root EC attestation certificate creation...");
 		if (TA_open_ec_attest_key(&obj_h) != TEE_SUCCESS) {
-			EMSG("Failed to open EC key, res=%x", res);
+			EMSG("Failed to open EC key, res=%" PRIx32, res);
 			goto error_1;
 		}
 		//Call ASN1 TA to generate root certificate
 		res = mbedTLS_gen_root_cert_ecc(obj_h, &root_cert);
 		if (res != TEE_SUCCESS) {
-			EMSG("Failed to generate EC root certificate, res=%x", res);
+			EMSG("Failed to generate EC root certificate, res=%" PRIx32, res);
 			goto error_2;
 		}
 
@@ -695,7 +695,7 @@ static TEE_Result TA_create_root_ec_attest_cert(void)
 				TEE_DATA_FLAG_ACCESS_WRITE,
 				TEE_HANDLE_NULL, NULL, 0U, &CertObject);
 		if (res != TEE_SUCCESS) {
-			EMSG("Failed to create a persistent EC certificate object, res=%x",
+			EMSG("Failed to create a persistent EC certificate object, res=%" PRIx32,
 					res);
 			goto error_2;
 		}
@@ -705,7 +705,7 @@ static TEE_Result TA_create_root_ec_attest_cert(void)
 					root_cert.data,
 					(uint32_t)root_cert.data_length);
 		if (res != TEE_SUCCESS) {
-			EMSG("Failed to write EC certificate, res=%x", res);
+			EMSG("Failed to write EC certificate, res=%" PRIx32, res);
 		}
 
 		(res == TEE_SUCCESS) ?
@@ -724,7 +724,7 @@ error_2:
 		TA_close_attest_obj(CertObject);
 	} else {
 		//Something wrong...
-		EMSG("Failed to open root EC attestation certificate, res=%x", res);
+		EMSG("Failed to open root EC attestation certificate, res=%" PRIx32, res);
 	}
 
 error_1:
@@ -745,7 +745,7 @@ keymaster_error_t TA_read_root_attest_cert(uint32_t type,
 	}
 
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to open root certificate, res=%x", res);
+		EMSG("Failed to open root certificate, res=%" PRIx32, res);
 		goto error;
 	}
 
@@ -753,7 +753,7 @@ keymaster_error_t TA_read_root_attest_cert(uint32_t type,
 	res = TA_read_attest_cert(rootAttCert, cert_chain);
 	if ((res != TEE_SUCCESS) &&
 		(res != TEE_ERROR_SHORT_BUFFER)) {
-		EMSG("Failed to read root certificate, res=%x", res);
+		EMSG("Failed to read root certificate, res=%" PRIx32, res);
 	}
 
 	TA_close_attest_obj(rootAttCert);
@@ -797,7 +797,7 @@ TEE_Result TA_gen_key_attest_cert(uint32_t type,
 	}
 
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to generated key certificate, res=%x", res);
+		EMSG("Failed to generated key certificate, res=%" PRIx32, res);
 	}
 
 	return res;
@@ -812,22 +812,22 @@ TEE_Result TA_create_attest_objs(void)
 
 	res = TA_create_rsa_attest_key();
 	if (res != TEE_SUCCESS) {
-		EMSG("Something wrong with root RSA key, res=%x", res);
+		EMSG("Something wrong with root RSA key, res=%" PRIx32, res);
 		return res;
 	}
 	res = TA_create_ec_attest_key();
 	if (res != TEE_SUCCESS) {
-		EMSG("Something wrong with root EC key, res=%x", res);
+		EMSG("Something wrong with root EC key, res=%" PRIx32, res);
 		return res;
 	}
 	res = TA_create_root_rsa_attest_cert();
 	if (res != TEE_SUCCESS) {
-		EMSG("Something wrong with root RSA certificate, res=%x", res);
+		EMSG("Something wrong with root RSA certificate, res=%" PRIx32, res);
 		return res;
 	}
 	res = TA_create_root_ec_attest_cert();
 	if (res != TEE_SUCCESS) {
-		EMSG("Something wrong with root EC certificate, res=%x", res);
+		EMSG("Something wrong with root EC certificate, res=%" PRIx32, res);
 		return res;
 	}
 	return res;
@@ -897,13 +897,13 @@ TEE_Result TA_read_attest_cert(TEE_ObjectHandle attObj,
 
 	res = TEE_SeekObjectData(attObj, 0, TEE_DATA_SEEK_SET);
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to seek root certificate, res=%x", res);
+		EMSG("Failed to seek root certificate, res=%" PRIx32, res);
 		return res;
 	}
 
 	res = TEE_GetObjectInfo1(attObj, &info);
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to get certificate info, res=%x", res);
+		EMSG("Failed to get certificate info, res=%" PRIx32, res);
 		return res;
 	}
 
@@ -912,20 +912,20 @@ TEE_Result TA_read_attest_cert(TEE_ObjectHandle attObj,
 	{
 		res = TEE_ReadObjectData(attObj, &nCertLen, sizeof(uint32_t), &actual_read);
 		if (res != TEE_SUCCESS || actual_read != sizeof(uint32_t)) {
-			EMSG("Failed to read root certificate length, res=%x", res);
+			EMSG("Failed to read root certificate length, res=%" PRIx32, res);
 			return res;
 		}
 		nEntryCount++;
 
 		res = TEE_SeekObjectData(attObj, nCertLen, TEE_DATA_SEEK_CUR);
 		if (res != TEE_SUCCESS) {
-			EMSG("Failed to seek root certificate, res=%x", res);
+			EMSG("Failed to seek root certificate, res=%" PRIx32, res);
 			return res;
 		}
 
 		res = TEE_GetObjectInfo1(attObj, &info);
 		if (res != TEE_SUCCESS) {
-			EMSG("Failed to get certificate info, res=%x", res);
+			EMSG("Failed to get certificate info, res=%" PRIx32, res);
 			return res;
 		}
 	}
@@ -938,13 +938,13 @@ TEE_Result TA_read_attest_cert(TEE_ObjectHandle attObj,
 
 	res = TEE_SeekObjectData(attObj, 0, TEE_DATA_SEEK_SET);
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to seek root certificate, res=%x", res);
+		EMSG("Failed to seek root certificate, res=%" PRIx32, res);
 		return res;
 	}
 
 	res = TEE_GetObjectInfo1(attObj, &info);
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to get certificate info, res=%x", res);
+		EMSG("Failed to get certificate info, res=%" PRIx32, res);
 		return res;
 	}
 
@@ -954,7 +954,7 @@ TEE_Result TA_read_attest_cert(TEE_ObjectHandle attObj,
 	{
 		res = TEE_ReadObjectData(attObj, &nCertLen, sizeof(uint32_t), &actual_read);
 		if (res != TEE_SUCCESS || actual_read != sizeof(uint32_t)) {
-			EMSG("Failed to read root certificate length, res=%x", res);
+			EMSG("Failed to read root certificate length, res=%" PRIx32, res);
 			goto error;
 		}
 
@@ -969,7 +969,7 @@ TEE_Result TA_read_attest_cert(TEE_ObjectHandle attObj,
 		res = TEE_ReadObjectData(attObj, pBuf, nCertLen, &actual_read);
 		if (res != TEE_SUCCESS || actual_read != nCertLen) {
 			TEE_Free(pBuf);
-			EMSG("Failed to read root certificate data, res=%x", res);
+			EMSG("Failed to read root certificate data, res=%" PRIx32, res);
 			goto error;
 		}
 		nCertLen = fetch_length(pBuf,nCertLen);
@@ -980,7 +980,7 @@ TEE_Result TA_read_attest_cert(TEE_ObjectHandle attObj,
 
 		res = TEE_GetObjectInfo1(attObj, &info);
 		if (res != TEE_SUCCESS) {
-			EMSG("Failed to get certificate info, res=%x", res);
+			EMSG("Failed to get certificate info, res=%" PRIx32, res);
 			goto error;
 		}
 	}
@@ -1023,19 +1023,19 @@ TEE_Result TA_generate_UniqueID(uint64_t T, uint8_t *appID, uint32_t appIDlen,
 	res = TEE_AllocateOperation(&op, TEE_ALG_HMAC_SHA256, TEE_MODE_MAC,
 			HMAC_SHA256_KEY_SIZE_BIT);
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to allocate HMAC operation, res=%x", res);
+		EMSG("Failed to allocate HMAC operation, res=%" PRIx32, res);
 		goto exit;
 	}
 
 	res = TA_open_secret_key(&key);
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to read secret key, res=%x", res);
+		EMSG("Failed to read secret key, res=%" PRIx32, res);
 		goto free_op;
 	}
 
 	res = TEE_SetOperationKey(op, key);
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to set secret key, res=%x", res);
+		EMSG("Failed to set secret key, res=%" PRIx32, res);
 		goto free_op;
 	}
 
@@ -1044,7 +1044,7 @@ TEE_Result TA_generate_UniqueID(uint64_t T, uint8_t *appID, uint32_t appIDlen,
 	TEE_MACUpdate(op, appID, appIDlen);
 	res = TEE_MACComputeFinal(op, &R, sizeof(uint8_t), hmac_buf, &hmac_length);
 	if (res != TEE_SUCCESS) {
-		EMSG("Failed to compute HMAC, res=%x", res);
+		EMSG("Failed to compute HMAC, res=%" PRIx32, res);
 		goto free_op;
 	}
 
