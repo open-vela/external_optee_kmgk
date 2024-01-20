@@ -86,7 +86,7 @@ static keymaster_error_t TA_save_gcm_tag(keymaster_blob_t *input,
 				(input->data_length - to_copy), to_copy);
 	input->data_length -= to_copy;
 	operation->a_data_length += to_copy;
-	DMSG("Tag has been stored with size %u", operation->a_data_length);
+	DMSG("Tag has been stored with size %" PRIu32, operation->a_data_length);
 	return res;
 }
 
@@ -438,7 +438,7 @@ keymaster_error_t TA_aes_init_operation(uint32_t algorithm, uint32_t mode,
 				    mode,
 				    (maxkeylen * 8));
 	if (result != TEE_SUCCESS) {
-		EMSG("can not allocate operation (0x%x)", result);
+		EMSG("can not allocate operation (0x%" PRIx32 ")", result);
 		res = KM_ERROR_MEMORY_ALLOCATION_FAILED;
 		goto out;
 	}
@@ -447,7 +447,7 @@ keymaster_error_t TA_aes_init_operation(uint32_t algorithm, uint32_t mode,
 					  (maxkeylen * 8),
 					  &trans_key);
 	if (result != TEE_SUCCESS) {
-		EMSG("can not allocate transient object 0x%x", result);
+		EMSG("can not allocate transient object 0x%" PRIx32, result);
 		res = KM_ERROR_MEMORY_ALLOCATION_FAILED;
 		goto out1;
 	}
