@@ -114,7 +114,7 @@ static TEE_Result TA_ReadAuthTokenKey(uint8_t *key, uint32_t key_size)
 {
 	TEE_Result res = TEE_SUCCESS;
 	TEE_ObjectHandle auth_token_key_obj = TEE_HANDLE_NULL;
-	uint32_t read_size = 0;
+	size_t read_size = 0;
 
 	res = TEE_OpenPersistentObject(TEE_STORAGE_PRIVATE,
 			auth_token_key_id, sizeof(auth_token_key_id),
@@ -128,7 +128,7 @@ static TEE_Result TA_ReadAuthTokenKey(uint8_t *key, uint32_t key_size)
 	res = TEE_ReadObjectData(auth_token_key_obj, key,
 			key_size, &read_size);
 	if (res != TEE_SUCCESS || key_size != read_size) {
-		EMSG("Failed to read secret data, bytes = %" PRIu32 ", res=%" PRIx32, read_size, res);
+		EMSG("Failed to read secret data, bytes = %zu, res=%" PRIx32, read_size, res);
 		goto close_obj;
 	}
 
@@ -254,7 +254,7 @@ exit:
 static TEE_Result TA_ComputeSignature(uint8_t *signature, size_t signature_length,
 	TEE_ObjectHandle key, const uint8_t *message, size_t length)
 {
-	uint32_t		buf_length = HMAC_SHA256_KEY_SIZE_BYTE;
+	size_t		buf_length = HMAC_SHA256_KEY_SIZE_BYTE;
 	uint8_t			buf[buf_length];
 	TEE_OperationHandle	op = TEE_HANDLE_NULL;
 	TEE_Result		res;
